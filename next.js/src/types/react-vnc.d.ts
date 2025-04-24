@@ -9,6 +9,8 @@ declare module 'react-vnc' {
     onConnect?: () => void;
     onDisconnect?: () => void;
     onError?: (error: Error) => void;
+    onCredentialsRequired?: (event) => void;
+    onSecurityFailure?: (event) => void;
     qualityLevel?: number;
     compressionLevel?: number;
     showStatus?: boolean;

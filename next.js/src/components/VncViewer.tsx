@@ -45,12 +45,6 @@ export default function VncViewer() {
   };
 
   const handleConnect = () => {
-    if (!password) {
-      const errorMessage = 'Please enter a password';
-      setError(errorMessage);
-      addErrorToHistory(errorMessage);
-      return;
-    }
     setError(null);
     setIsManualDisconnect(false);
     if (vncRef.current) {
@@ -167,11 +161,13 @@ export default function VncViewer() {
               width: '100%',
               height: '100%',
             }}
-            rfbOptions={{
-              credentials: {
-                password: password
+            {...(password ? {
+              rfbOptions: {
+                credentials: {
+                  password: password
+                }
               }
-            }}
+            } : {})}
             onConnect={() => {
               console.log('Connected to VNC server');
               setIsConnected(true);
@@ -185,6 +181,19 @@ export default function VncViewer() {
                 setError(errorMessage);
                 addErrorToHistory(errorMessage);
               }
+            }}
+            onCredentialsRequired={(event) => {
+              console.log('Credentials required for VNC connection');
+              console.log(event);
+              const errorMessage = 'VNC server requires credentials. Please enter the password.';
+              setError(errorMessage);
+              addErrorToHistory(errorMessage);
+            }}
+            onSecurityFailure={(event) => {
+              const errorMessage = `Security failure for VNC connection: ${event.detail.reason}`;
+              console.log(errorMessage);
+              setError(errorMessage);
+              addErrorToHistory(errorMessage);
             }}
           />
         )}
