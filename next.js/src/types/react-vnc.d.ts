@@ -13,6 +13,11 @@ declare module 'react-vnc' {
     compressionLevel?: number;
     showStatus?: boolean;
     ref?: Ref<any>;
+    rfbOptions?: {
+      credentials?: {
+        password: string;
+      };
+    };
   }
 
   export const VncScreen: FC<VncScreenProps>;

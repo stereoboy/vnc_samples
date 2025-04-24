@@ -14,6 +14,7 @@ export default function VncViewer() {
   const [error, setError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
   const [isManualDisconnect, setIsManualDisconnect] = useState(true);
+  const [password, setPassword] = useState('');
   const vncRef = useRef<any>(null);
 
   useEffect(() => {
@@ -28,6 +29,10 @@ export default function VncViewer() {
   }, [isConnected, retryCount, isManualDisconnect]);
 
   const handleConnect = () => {
+    if (!password) {
+      setError('Please enter a password');
+      return;
+    }
     setRetryCount(0);
     setError(null);
     setIsManualDisconnect(false);
@@ -75,8 +80,22 @@ export default function VncViewer() {
         marginBottom: '10px',
         display: 'flex',
         justifyContent: 'center',
-        gap: '10px'
+        gap: '10px',
+        alignItems: 'center'
       }}>
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Enter VNC password"
+          style={{
+            padding: '8px 12px',
+            border: '1px solid #ced4da',
+            borderRadius: '4px',
+            fontSize: '1em',
+            width: '200px'
+          }}
+        />
         <button
           onClick={handleConnect}
           disabled={isConnected}
@@ -131,6 +150,11 @@ export default function VncViewer() {
             style={{
               width: '100%',
               height: '100%',
+            }}
+            rfbOptions={{
+              credentials: {
+                password: password
+              }
             }}
             onConnect={() => {
               console.log('Connected to VNC server');
