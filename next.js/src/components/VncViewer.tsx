@@ -1,7 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 
 // Import VncScreen dynamically to avoid SSR issues
 const VncScreen = dynamic(
@@ -12,28 +12,15 @@ const VncScreen = dynamic(
 export default function VncViewer() {
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [retryCount, setRetryCount] = useState(0);
   const [isManualDisconnect, setIsManualDisconnect] = useState(true);
   const [password, setPassword] = useState('');
   const vncRef = useRef<any>(null);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (!isConnected && retryCount < 5 && !isManualDisconnect) {
-        setRetryCount(prev => prev + 1);
-        setError(`Retrying connection (attempt ${retryCount + 1}/5)...`);
-      }
-    }, 3000);
-
-    return () => clearTimeout(timer);
-  }, [isConnected, retryCount, isManualDisconnect]);
 
   const handleConnect = () => {
     if (!password) {
       setError('Please enter a password');
       return;
     }
-    setRetryCount(0);
     setError(null);
     setIsManualDisconnect(false);
     if (vncRef.current) {
@@ -143,7 +130,6 @@ export default function VncViewer() {
         {!isManualDisconnect && (
           <VncScreen
             ref={vncRef}
-            key={retryCount}
             url="ws://localhost:5901"
             scaleViewport
             background="#000000"
