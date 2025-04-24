@@ -22,11 +22,21 @@
 * Open Source
   * https://github.com/roerohan/react-vnc
 
+## noVNC
+
+### noVNC Test
+* https://novnc.com/noVNC/vnc.html
+
+#### Advanced
+* WebSocket
+Host: localhost
+Port: 5901
+
 ## Test
 
 ### Scenario #0
 
-#### Server Setup (Windows 11)
+#### Server Setup #0 (Windows 11): Non-SSL, Non-Password
 * Download `tigervnc64-winvnc-1.15.0.exe` from https://sourceforge.net/projects/tigervnc/files/stable/1.15.0/
 * install `tigervnc64-winvnc-1.15.0.exe`
 * Run `Run VNC Server`
@@ -35,10 +45,21 @@
   * Session Encryption -> None only
   * Check Authentication -> None only
 
+#### Server Setup #1 (Windows 11): Non-SSL, Password
+* Download `tigervnc64-winvnc-1.15.0.exe` from https://sourceforge.net/projects/tigervnc/files/stable/1.15.0/
+* install `tigervnc64-winvnc-1.15.0.exe`
+* Run `Run VNC Server`
+* open `Control Panel` by clicking `VNC server` on startup programs
+* Check Security Tab
+  * Session Encryption -> None only
+  * Check Authentication -> Standard VNC
+    * Configure
+      * set password
+
 #### Client  (Ubuntu 20.04)
 * run websokify to proxy
 ```
-websockify -v  5901 192.168.55.34:5900
+websockify -v  5901 192.168.55.34:5900 (No SSL)
 ```
 * run app
 ```
