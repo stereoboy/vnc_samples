@@ -13,7 +13,7 @@ export default function VncViewer() {
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
-  const [isManualDisconnect, setIsManualDisconnect] = useState(false);
+  const [isManualDisconnect, setIsManualDisconnect] = useState(true);
   const vncRef = useRef<any>(null);
 
   useEffect(() => {
@@ -118,31 +118,34 @@ export default function VncViewer() {
         border: '2px solid #007bff',
         borderRadius: '4px',
         overflow: 'hidden',
-        position: 'relative'
+        position: 'relative',
+        backgroundColor: '#000000'
       }}>
-        <VncScreen
-          ref={vncRef}
-          key={retryCount}
-          url="ws://localhost:5901"
-          scaleViewport
-          background="#000000"
-          style={{
-            width: '100%',
-            height: '100%',
-          }}
-          onConnect={() => {
-            console.log('Connected to VNC server');
-            setIsConnected(true);
-            setError(null);
-          }}
-          onDisconnect={() => {
-            console.log('Disconnected from VNC server');
-            setIsConnected(false);
-            if (!isManualDisconnect) {
-              setError('Disconnected from VNC server');
-            }
-          }}
-        />
+        {!isManualDisconnect && (
+          <VncScreen
+            ref={vncRef}
+            key={retryCount}
+            url="ws://localhost:5901"
+            scaleViewport
+            background="#000000"
+            style={{
+              width: '100%',
+              height: '100%',
+            }}
+            onConnect={() => {
+              console.log('Connected to VNC server');
+              setIsConnected(true);
+              setError(null);
+            }}
+            onDisconnect={() => {
+              console.log('Disconnected from VNC server');
+              setIsConnected(false);
+              if (!isManualDisconnect) {
+                setError('Disconnected from VNC server');
+              }
+            }}
+          />
+        )}
         {!isConnected && error && !isManualDisconnect && (
           <div style={{
             position: 'absolute',
