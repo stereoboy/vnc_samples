@@ -9,16 +9,46 @@ const VncScreen = dynamic(
   { ssr: false }
 );
 
+interface ErrorEntry {
+  message: string;
+  timestamp: Date;
+}
+
 export default function VncViewer() {
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [errorHistory, setErrorHistory] = useState<ErrorEntry[]>([]);
   const [isManualDisconnect, setIsManualDisconnect] = useState(true);
   const [password, setPassword] = useState('');
   const vncRef = useRef<any>(null);
 
+  const addErrorToHistory = (errorMessage: string) => {
+    setErrorHistory(prev => {
+      const newHistory = [{ message: errorMessage, timestamp: new Date() }, ...prev].slice(0, 5);
+      return newHistory;
+    });
+  };
+
+  const formatTimestamp = (date: Date | undefined) => {
+    if (!date) return 'Unknown time';
+    try {
+      return date.toLocaleTimeString('en-US', {
+        hour12: false,
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
+    } catch (error) {
+      console.error('Error formatting timestamp:', error);
+      return 'Invalid time';
+    }
+  };
+
   const handleConnect = () => {
     if (!password) {
-      setError('Please enter a password');
+      const errorMessage = 'Please enter a password';
+      setError(errorMessage);
+      addErrorToHistory(errorMessage);
       return;
     }
     setError(null);
@@ -151,23 +181,51 @@ export default function VncViewer() {
               console.log('Disconnected from VNC server');
               setIsConnected(false);
               if (!isManualDisconnect) {
-                setError('Disconnected from VNC server');
+                const errorMessage = 'Disconnected from VNC server';
+                setError(errorMessage);
+                addErrorToHistory(errorMessage);
               }
             }}
           />
         )}
-        {!isConnected && error && !isManualDisconnect && (
+      </div>
+      <div style={{
+        width: '100%',
+        maxWidth: '1200px',
+        marginTop: '10px',
+        padding: '10px',
+        backgroundColor: '#fff3cd',
+        border: '1px solid #ffeeba',
+        borderRadius: '4px',
+        minHeight: '150px',
+        maxHeight: '150px',
+        overflowY: 'auto'
+      }}>
+        <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>Error History:</div>
+        {errorHistory.length > 0 ? (
+          errorHistory.map((error, index) => (
+            <div key={index} style={{
+              padding: '5px 0',
+              borderBottom: index < errorHistory.length - 1 ? '1px solid #ffeeba' : 'none',
+              fontSize: '0.9em',
+              display: 'flex',
+              gap: '10px',
+              alignItems: 'baseline'
+            }}>
+              <div style={{ color: '#666', fontSize: '0.8em', minWidth: '80px' }}>
+                [{formatTimestamp(error.timestamp)}]
+              </div>
+              <div>{error.message}</div>
+            </div>
+          ))
+        ) : (
           <div style={{
-            position: 'absolute',
-            top: '20px',
-            left: '20px',
-            padding: '10px',
-            backgroundColor: '#fff3cd',
-            border: '1px solid #ffeeba',
-            borderRadius: '4px',
-            zIndex: 1000,
+            padding: '5px 0',
+            fontSize: '0.9em',
+            color: '#666',
+            textAlign: 'center'
           }}>
-            <div>{error}</div>
+            No errors yet
           </div>
         )}
       </div>
